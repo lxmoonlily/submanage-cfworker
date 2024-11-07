@@ -35,6 +35,9 @@
 
 addEventListener('fetch', event => event.respondWith(handleRequest(event.request)));
 
+//必填
+const selfURL = '';
+
 //基本参数
 const fakedomain = "";
 const fakeurl = "";
@@ -53,8 +56,6 @@ const extractors = {
     'vless': link => link.match(/:\/\/(.*?)@/)[1], // 提取 vless 协议的 UUID
     'vmess': link => JSON.parse(atob(link.slice(8))).id // 提取 vmess 协议的 UUID
 };
-
-const selfURL = '';
 
 const keyValuePairs = new Map(); // 使用 Map 存储 UUID 映射
 
