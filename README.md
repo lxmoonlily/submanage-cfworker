@@ -9,6 +9,7 @@
 3. 绑定 KV 到新建的项目中。
 4. 修改代码中 KV 变量的名称与绑定的 KV 变量名称一致。（查找‘yourkvspace并全部替换成你的kv空间变量名’）
 5. 在代码中填写fakedomain、fakeurl等信息
+6. 填写selfURL，复制修改后的代码，再次新建一个worker，绑定创建好的kv到新建的worker中（即两个worker使用同一个kv变量）。
 
 ## 使用说明
 
