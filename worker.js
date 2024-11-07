@@ -41,6 +41,12 @@ const fakeurl = "";
 const fakeSubLink = "";
 const fakeSubConfig =  "";
 
+const responsePaths = {
+    "x": (sublink) => `${sublink}/xray?config=`,
+    "c": (sublink) => `${sublink}/clash?config=`,
+    "s": (sublink) => `${sublink}/singbox?config=`
+};
+
 //定义uuid获取方式
 const extractors = {
     'trojan': link => link.match(/:\/\/(.*?)@/)[1], // 提取 trojan 协议的 UUID
@@ -151,11 +157,8 @@ async function returnLinksConfig(path, useridData, uuid, userId) {
         ]);
     }
 
-    let responsePath = {
-        "x": `${sublink}/xray?config=`,
-        "c": `${sublink}/clash?config=`,
-        "s": `${sublink}/singbox?config=`
-    }[path[1]];
+    let responsePath = responsePaths[path[1]] ? responsePaths[path[1]](sublink) : null;
+  
     if(sublink && !subconfig){
         [responsePath , subconfig] =  sublink.split('mylinks');
     }
