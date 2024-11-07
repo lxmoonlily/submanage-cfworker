@@ -89,7 +89,7 @@ async function ifPost(formData, { userId, uuid, olduserid }) {
     const { input1 = '', input2 = '', inputSublink = '', inputSubconfig = '' } = formData;
     const userkey = await addUserIdData(input1, input2, olduserid, inputSublink, inputSubconfig, userId , uuid);
 
-    const useridData = await mixproxy.get(userkey);
+    const useridData = await yourkvspace.get(userkey);
     const [encheckinput1, encheckinput2, checkinputSublink, checkinputSubconfig] = useridData.split('@split@');
     const [checkput1, checkput2] = await Promise.all([
         deCD(encheckinput1, uuid),
@@ -114,7 +114,7 @@ async function ifGet(path, { userId, uuid, olduserid }) {
         return getResponse('用户已删除！');
     }
     
-    let useridData = olduserid ? await mixproxy.get(olduserid) : '';
+    let useridData = olduserid ? await yourkvspace.get(olduserid) : '';
     if (path[1] === 'manage') {
         return ifManage(userId, uuid, useridData);
     }
@@ -186,7 +186,7 @@ async function addUserIdData(input1, input2, olduserid, inputSublink, inputSubco
     if (!olduserid) {
         await updateUserId (newuserid, 1);
     }
-    await mixproxy.put(userkey, `${eninput1}@split@${eninput2}@split@${inputSublink}@split@${inputSubconfig}`);
+    await yourkvspace.put(userkey, `${eninput1}@split@${eninput2}@split@${inputSublink}@split@${inputSubconfig}`);
     return userkey;
 
 }
@@ -194,7 +194,7 @@ async function addUserIdData(input1, input2, olduserid, inputSublink, inputSubco
 //更新kv
 async function updateUserId(userid, isADD) {
     // 从 KV 存储中获取 manageuserid 的值并分割成数组
-    const existinguserid = (await mixproxy.get('manageuserid')) || '';
+    const existinguserid = (await yourkvspace.get('manageuserid')) || '';
     let userIdList = existinguserid ? existinguserid.split('@split@') : [];
 
     if (isADD) {
@@ -204,29 +204,29 @@ async function updateUserId(userid, isADD) {
         }
     } else {
         if (!userIdList.includes(userid)) {
-            await mixproxy.put('fakeuseridconfig',await enCD(userid));
+            await yourkvspace.put('fakeuseridconfig',await enCD(userid));
             return getResponse('用户已删除！');
         }
         // 删除操作：从数组中移除该用户ID
         userIdList = userIdList.filter(storedUserId => storedUserId !== userid);
 
         // 删除单独存储的用户的数据 
-        await mixproxy.delete(userid);
+        await yourkvspace.delete(userid);
 
 
     }
     // 将更新后的用户ID数组重新组合成字符串
     const updateduserid = userIdList.join('@split@');
 
-    // 将新的用户ID列表保存回 mixproxy 中
+    // 将新的用户ID列表保存回 yourkvspace 中
     if (updateduserid) {
-        await mixproxy.put('manageuserid', updateduserid);
+        await yourkvspace.put('manageuserid', updateduserid);
     } else {
-        await mixproxy.delete('manageuserid'); // 如果列表为空，删除键
+        await yourkvspace.delete('manageuserid'); // 如果列表为空，删除键
     }
 
     if(!isADD){
-        await mixproxy.put('fakeuseridconfig',await enCD(userid));
+        await yourkvspace.put('fakeuseridconfig',await enCD(userid));
         return getResponse('用户已删除！');
     }
 
@@ -239,7 +239,7 @@ async function findUserId(targetUserId, uuid) {
 
     try {
         // 直接获取 manageuserid 键下的所有加密用户名
-        const encryptedNames = await mixproxy.get('manageuserid');
+        const encryptedNames = await yourkvspace.get('manageuserid');
         if (!encryptedNames) return "";
 
         // 分割加密的用户名
@@ -431,11 +431,11 @@ async function restoreUUID(enLinks) {
 
 //创建假的订阅信息
 async function fakeMessage(userId){
-    const isTrue = await mixproxy.get('fakeuseridconfig');
+    const isTrue = await yourkvspace.get('fakeuseridconfig');
     if (!isTrue){
-        await mixproxy.put('fakeuseridconfig',await enCD(userId));
+        await yourkvspace.put('fakeuseridconfig',await enCD(userId));
     }
-    const fakeuserid = `${userId}${await mixproxy.get('fakeuseridconfig')}`;
+    const fakeuserid = `${userId}${await yourkvspace.get('fakeuseridconfig')}`;
     let { randomNum }= await get_UUID_Num (fakeuserid,1,50);
     const randomSubscriptions = await Promise.all(Array.from({ length: randomNum }, async (_, i) => {
         const userid = `${fakeuserid}${i + 1}`; // 生成 userid1 到 userid{randomNum}
