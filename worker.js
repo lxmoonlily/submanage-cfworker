@@ -36,7 +36,7 @@
 addEventListener('fetch', event => event.respondWith(handleRequest(event.request)));
 
 //基本参数
-const fakedomain = "cloudflare.com";
+const fakedomain = "";
 const fakeurl = "";
 const fakeSubLink = "";
 const fakeSubConfig =  "";
