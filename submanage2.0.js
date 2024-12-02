@@ -760,7 +760,9 @@ try {
   // 获取 selectkeyword 中的所有元素
   const selectKeywords = UNIFIED_RULES.selectkeyword;
   // 筛选出 group 中 `outbound` 为 selectKeyword 中内容的条目
-  const filteredGroup = UNIFIED_RULES.group.filter(item => selectKeywords.includes(item.outbound));
+  const filteredGroup = UNIFIED_RULES.group
+  .filter(item => selectKeywords.includes(item.outbound))
+  .sort((a, b) => selectKeywords.indexOf(a.outbound) - selectKeywords.indexOf(b.outbound));
   const proxyMap = {
 
   };//筛选每个代理组的代理
